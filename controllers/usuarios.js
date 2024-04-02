@@ -28,22 +28,36 @@ module.exports = {
                 dados: error.message
             });
         }
-    },
+    }, 
     async cadastrarUsuarios(request, response) {
         try {
+            // parâmetros recebidos no corpo da requisição
+            const { usu_nome, usu_email, usu_dt_nasc, usu_senha, usu_tipo, usu_ativo } = request.body;
+            // instrução SQL
+            const sql = `INSERT INTO usuarios 
+                (usu_nome, usu_email, usu_dt_nasc, usu_senha, usu_tipo, usu_ativo) 
+                VALUES (?, ?, ?, ?, ?, ?)`;
+            // definição dos dados a serem inseridos em um array
+            const values = [usu_nome, usu_email, usu_dt_nasc, usu_senha, usu_tipo, usu_ativo];  
+            // execução da instrução sql passando os parâmetros
+            const execSql = await db.query(sql, values); 
+            // identificação do ID do registro inserido
+            const usu_id = execSql[0].insertId;           
+
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: 'Cadastro de usuários.', 
-                dados: null
+                mensagem: 'Cadastro de usuário efetuado com sucesso.', 
+                dados: usu_id, 
+                sql: execSql
             });
         } catch (error) {
             return response.status(500).json({
                 sucesso: false, 
-                mensagem: `Erro na requisição. -${error}`, 
-                dados: null
+                mensagem: 'Erro na requisição.', 
+                dados: error.message
             });
         }
-    }, 
+    },
     async editarUsuarios(request, response) {
         try {
             // parâmetros recebidos pelo corpo da requisição
@@ -75,18 +89,27 @@ module.exports = {
     }, 
     async apagarUsuarios(request, response) {
         try {
+            // parâmetro passado via url na chamada da api pelo front-end
+            const { usu_id } = request.params; 
+            // comando de exclusão
+            const sql = `DELETE FROM usuarios WHERE usu_id = ?`;
+            // array com parâmetros da exclusão
+            const values = [usu_id]; 
+            // executa instrução no banco de dados
+            const excluir = await db.query(sql, values); 
+
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: 'Apagar usuários.', 
-                dados: null
+                mensagem: `Usuário ${usu_id} excluído com sucesso`, 
+                dados: excluir[0].affectedRows
             });
         } catch (error) {
             return response.status(500).json({
                 sucesso: false, 
-                mensagem: `Erro na requisição. -${error}`, 
-                dados: null
+                mensagem: 'Erro na requisição.', 
+                dados: error.message
             });
         }
-    }, 
+    },  
 }
 
