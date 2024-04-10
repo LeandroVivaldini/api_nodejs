@@ -46,13 +46,13 @@ module.exports = {
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Cadastro de produtos.', 
-                dados: null
+                dados: pd_id
             });
         } catch (error) {
             return response.status(500).json({
                 sucesso: false, 
                 mensagem: `Erro na requisição. -${error}`, 
-                dados: null
+                dados: error.message
             });
         }
     }, 
